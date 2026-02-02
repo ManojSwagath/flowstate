@@ -771,6 +771,7 @@ body {
     font-weight: 700;
     text-align: center;
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .custom-time::-webkit-outer-spin-button,
