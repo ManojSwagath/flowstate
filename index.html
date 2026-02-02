@@ -3,342 +3,825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowState - Deep Focus Timer</title>
-    <link rel="stylesheet" href="style.css">
+    <title>FlowState - Focus Timer with Binaural Beats</title>
+    <meta name="description" content="Achieve deep focus with binaural beats, ambient sounds, and gamified productivity. Free desktop widget that stays on top of your work.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: #1a1a24;
+            --accent-primary: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.7);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            border-radius: 10px;
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--accent-glow);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text h1 span {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .badge-icon {
+            font-size: 1rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            color: white;
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Widget Preview */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .widget-preview {
+            width: 280px;
+            background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 0 60px rgba(99, 102, 241, 0.2);
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .widget-dots {
+            display: flex;
+            gap: 6px;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f57; }
+        .dot-yellow { background: #febc2e; }
+        .dot-green { background: #28c840; }
+
+        .widget-timer {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer-ring-preview {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .timer-ring-preview svg {
+            transform: rotate(-90deg);
+        }
+
+        .ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 8;
+        }
+
+        .ring-fill {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 94;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .timer-digits-preview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .widget-stats {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stat-badge.gold {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #000;
+        }
+
+        .widget-btn-preview {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        /* Floating elements */
+        .floating-badge {
+            position: absolute;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: floatBadge 4s ease-in-out infinite;
+        }
+
+        .floating-badge.xp {
+            top: 10%;
+            right: -20%;
+            animation-delay: 0s;
+        }
+
+        .floating-badge.streak {
+            bottom: 20%;
+            left: -25%;
+            animation-delay: 2s;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Download Section */
+        .download {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%);
+        }
+
+        .download-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .download-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .download-content > p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .download-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-card.featured {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .download-card .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .download-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            min-height: 48px;
+        }
+
+        .download-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .download-size {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .download-note {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            color: #fbbf24;
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.75rem;
+            }
+
+            .hero-badges, .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .floating-badge {
+                display: none;
+            }
+
+            .download-options {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Animated background particles -->
-    <div class="particles" id="particles"></div>
-    
-    <!-- Audio visualizer rings -->
-    <div class="visualizer" id="visualizer">
-        <div class="ring ring-1"></div>
-        <div class="ring ring-2"></div>
-        <div class="ring ring-3"></div>
-    </div>
+    <div class="bg-gradient"></div>
 
-    <!-- Floating Mini Timer Widget (Draggable) -->
-    <div class="mini-timer" id="miniTimer">
-        <div class="mini-timer-header" id="miniTimerHeader">
-            <span class="mini-timer-drag">⋮⋮</span>
-            <span class="mini-timer-title">FlowState</span>
-            <button class="mini-timer-close" id="miniTimerClose">−</button>
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">◉</div>
+            <span>FlowState</span>
         </div>
-        <div class="mini-timer-body">
-            <div class="mini-timer-ring">
-                <svg viewBox="0 0 60 60">
-                    <circle class="mini-ring-bg" cx="30" cy="30" r="26"/>
-                    <circle class="mini-ring-fill" id="miniProgressRing" cx="30" cy="30" r="26"/>
-                </svg>
-                <span class="mini-timer-display" id="miniTimerDisplay">25:00</span>
-            </div>
-            <div class="mini-timer-controls">
-                <button class="mini-btn mini-start" id="miniStartBtn">▶</button>
-                <button class="mini-btn mini-pause hidden" id="miniPauseBtn">⏸</button>
-                <button class="mini-btn mini-reset" id="miniResetBtn">↺</button>
-            </div>
-            <div class="mini-timer-status" id="miniTimerStatus">Ready</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#download">Download</a>
+            <a href="https://github.com/ManojSwagath/flowstate" target="_blank">GitHub</a>
+            <a href="app.html" class="nav-cta">Try Web App</a>
         </div>
-    </div>
+    </nav>
 
-    <!-- Mini Timer Toggle Button (shows when mini timer is hidden) -->
-    <button class="mini-timer-toggle hidden" id="miniTimerToggle" title="Show Mini Timer">
-        <span>◉</span>
-    </button>
-
-    <!-- Achievement unlock notification -->
-    <div class="achievement-popup hidden" id="achievementPopup">
-        <div class="achievement-icon" id="achievementIcon">🏆</div>
-        <div class="achievement-info">
-            <span class="achievement-label">Achievement Unlocked!</span>
-            <span class="achievement-name" id="achievementName">First Focus</span>
-        </div>
-    </div>
-
-    <!-- XP gain notification -->
-    <div class="xp-popup hidden" id="xpPopup">+<span id="xpAmount">50</span> XP</div>
-
-    <div class="container">
-        <!-- Headphone reminder banner -->
-        <div class="headphone-banner" id="headphoneBanner">
-            <span class="headphone-icon">🎧</span>
-            <span class="headphone-text">Use headphones for the best binaural beats experience</span>
-            <button class="headphone-close" id="headphoneClose">✕</button>
-        </div>
-
-        <!-- Header with streak counter -->
-        <header class="header">
-            <div class="logo">
-                <span class="logo-icon">◉</span>
-                <span class="logo-text">FlowState</span>
-            </div>
-            <div class="header-right">
-                <div class="level-badge" id="levelBadge">
-                    <span class="level-icon">⭐</span>
-                    <span class="level-number" id="levelNumber">1</span>
-                </div>
-                <div class="streak-badge" id="streakBadge">
-                    <span class="fire-icon">🔥</span>
-                    <span class="streak-count" id="streakCount">0</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- XP Progress Bar -->
-        <div class="xp-bar-container">
-            <div class="xp-bar">
-                <div class="xp-fill" id="xpFill" style="width: 0%"></div>
-            </div>
-            <div class="xp-info">
-                <span class="xp-current" id="xpCurrent">0</span>
-                <span class="xp-separator">/</span>
-                <span class="xp-needed" id="xpNeeded">100</span>
-                <span class="xp-label">XP to Level <span id="nextLevel">2</span></span>
-            </div>
-        </div>
-
-        <!-- Daily Challenge Card -->
-        <div class="daily-challenge" id="dailyChallenge">
-            <div class="challenge-header">
-                <span class="challenge-icon">🎯</span>
-                <span class="challenge-title">Daily Challenge</span>
-                <span class="challenge-reward">+100 XP</span>
-            </div>
-            <p class="challenge-text" id="challengeText">Complete 3 focus sessions today</p>
-            <div class="challenge-progress">
-                <div class="challenge-bar">
-                    <div class="challenge-fill" id="challengeFill" style="width: 0%"></div>
-                </div>
-                <span class="challenge-count" id="challengeCount">0/3</span>
-            </div>
-        </div>
-
-        <!-- Main card -->
-        <main class="main-card">
-            <!-- Task input with floating label -->
-            <div class="task-input-wrapper">
-                <input 
-                    type="text" 
-                    id="taskInput" 
-                    class="task-input" 
-                    placeholder=" "
-                    maxlength="50"
-                >
-                <label class="task-label">What are you working on? (optional)</label>
-                <div class="input-glow"></div>
-            </div>
-
-            <!-- Timer display -->
-            <div class="timer-container">
-                <div class="timer-ring" id="timerRing">
-                    <svg class="progress-ring" viewBox="0 0 200 200">
-                        <circle class="progress-ring-bg" cx="100" cy="100" r="90"/>
-                        <circle class="progress-ring-fill" id="progressRing" cx="100" cy="100" r="90"/>
-                    </svg>
-                    <div class="timer-display">
-                        <span class="timer-digits" id="timerDisplay">25:00</span>
-                        <span class="timer-status" id="timerStatus">Ready to focus</span>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Unlock Your <span>Deep Focus</span> Superpower</h1>
+                <p>A beautiful floating timer with binaural beats and ambient sounds that stays on top of your work. Gamified with XP, levels, and streaks to keep you coming back.</p>
+                
+                <div class="hero-badges">
+                    <div class="badge">
+                        <span class="badge-icon">🧠</span>
+                        Binaural Beats
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">🎵</span>
+                        Ambient Sounds
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">🏆</span>
+                        XP & Achievements
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">💯</span>
+                        100% Free
                     </div>
                 </div>
-            </div>
 
-            <!-- Motivational message during focus -->
-            <div class="focus-message hidden" id="focusMessage">
-                <span class="message-text" id="messageText">You're doing great! Keep going!</span>
-            </div>
-
-            <!-- Preset buttons -->
-            <div class="presets">
-                <button class="preset-btn active" data-time="25">
-                    <span class="preset-time">25</span>
-                    <span class="preset-label">min</span>
-                </button>
-                <button class="preset-btn" data-time="45">
-                    <span class="preset-time">45</span>
-                    <span class="preset-label">min</span>
-                </button>
-                <button class="preset-btn" data-time="60">
-                    <span class="preset-time">60</span>
-                    <span class="preset-label">min</span>
-                </button>
-                <div class="custom-time-wrapper">
-                    <input 
-                        type="number" 
-                        id="customTime" 
-                        class="custom-time" 
-                        placeholder="?"
-                        min="1" 
-                        max="180"
-                    >
-                    <span class="custom-label">min</span>
+                <div class="hero-buttons">
+                    <a href="#download" class="btn btn-primary">
+                        <span>⬇️</span>
+                        Download for Windows
+                    </a>
+                    <a href="app.html" class="btn btn-secondary">
+                        <span>🌐</span>
+                        Try in Browser
+                    </a>
                 </div>
             </div>
 
-            <!-- Binaural mode selector -->
-            <div class="mode-selector">
-                <label class="mode-label">
-                    <span class="brain-icon">🧠</span>
-                    Brain Mode
-                </label>
-                <div class="mode-dropdown-wrapper">
-                    <select id="binauralMode" class="mode-dropdown">
-                        <option value="10">⚡ Focus (10 Hz) - Alpha waves</option>
-                        <option value="16">🚀 Deep Work (16 Hz) - Beta waves</option>
-                        <option value="6">🌊 Chill (6 Hz) - Theta waves</option>
-                    </select>
+            <div class="hero-visual">
+                <!-- Floating badges -->
+                <div class="floating-badge xp">
+                    <span style="color: #a855f7; font-weight: 700;">+75 XP</span>
                 </div>
-            </div>
-
-            <!-- Ambient Sound Selector -->
-            <div class="ambient-selector">
-                <label class="mode-label">
-                    <span class="ambient-icon">🎵</span>
-                    Ambient Sound
-                </label>
-                <div class="ambient-buttons">
-                    <button class="ambient-btn active" data-sound="none" title="None">
-                        <span>🔇</span>
-                    </button>
-                    <button class="ambient-btn" data-sound="rain" title="Rain">
-                        <span>🌧️</span>
-                    </button>
-                    <button class="ambient-btn" data-sound="fire" title="Fireplace">
-                        <span>🔥</span>
-                    </button>
-                    <button class="ambient-btn" data-sound="forest" title="Forest">
-                        <span>🌲</span>
-                    </button>
-                    <button class="ambient-btn" data-sound="waves" title="Ocean">
-                        <span>🌊</span>
-                    </button>
+                <div class="floating-badge streak">
+                    <span>🔥 5 Day Streak!</span>
                 </div>
-            </div>
 
-            <!-- Volume control -->
-            <div class="volume-control">
-                <span class="volume-icon" id="volumeIcon">🔉</span>
-                <input 
-                    type="range" 
-                    id="volumeSlider" 
-                    class="volume-slider" 
-                    min="0" 
-                    max="100" 
-                    value="20"
-                >
-                <span class="volume-value" id="volumeValue">20%</span>
-            </div>
-
-            <!-- Control buttons -->
-            <div class="controls">
-                <button class="control-btn start-btn" id="startBtn">
-                    <span class="btn-icon">▶</span>
-                    <span class="btn-text">Start Focus</span>
-                </button>
-                <button class="control-btn pause-btn hidden" id="pauseBtn">
-                    <span class="btn-icon">⏸</span>
-                    <span class="btn-text">Pause</span>
-                </button>
-                <button class="control-btn reset-btn" id="resetBtn">
-                    <span class="btn-icon">↺</span>
-                    <span class="btn-text">Reset</span>
-                </button>
-            </div>
-        </main>
-
-        <!-- Stats section -->
-        <section class="stats-section">
-            <h3 class="stats-title">Today's Progress</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-value" id="sessionsToday">0</span>
-                    <span class="stat-label">Sessions</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="minutesToday">0</span>
-                    <span class="stat-label">Minutes</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="focusScore">0</span>
-                    <span class="stat-label">Focus Score</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Achievements Section -->
-        <section class="achievements-section">
-            <h3 class="stats-title">
-                <span>🏆 Achievements</span>
-                <span class="achievement-counter" id="achievementCounter">0/12</span>
-            </h3>
-            <div class="achievements-grid" id="achievementsGrid">
-                <!-- Achievements populated by JS -->
-            </div>
-        </section>
-
-        <!-- Session History -->
-        <section class="history-section">
-            <h3 class="stats-title">📜 Recent Sessions</h3>
-            <div class="history-list" id="historyList">
-                <p class="history-empty">Complete your first session to see history</p>
-            </div>
-        </section>
-
-        <!-- Motivational quotes -->
-        <div class="quote-container" id="quoteContainer">
-            <p class="quote-text" id="quoteText">"The successful warrior is the average man, with laser-like focus."</p>
-            <span class="quote-author" id="quoteAuthor">— Bruce Lee</span>
-        </div>
-
-        <!-- Session complete modal -->
-        <div class="modal-overlay hidden" id="completeModal">
-            <div class="modal-content">
-                <div class="confetti" id="confetti"></div>
-                <div class="celebration">🎉</div>
-                <h2 class="modal-title">Session Complete!</h2>
-                <p class="modal-message" id="modalMessage">You focused for 25 minutes</p>
-                
-                <div class="modal-xp-gain">
-                    <span class="xp-gained" id="xpGained">+75 XP</span>
-                </div>
-                
-                <div class="modal-stats-row">
-                    <div class="modal-stat">
-                        <span class="modal-stat-value" id="modalSessions">1</span>
-                        <span class="modal-stat-label">Sessions today</span>
+                <!-- Widget Preview -->
+                <div class="widget-preview">
+                    <div class="widget-dots">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
                     </div>
-                    <div class="modal-stat">
-                        <span class="modal-stat-value" id="modalStreak">1</span>
-                        <span class="modal-stat-label">Day streak</span>
+
+                    <div class="widget-stats">
+                        <div class="stat-badge gold">
+                            <span>⭐</span>
+                            <span>Lvl 7</span>
+                        </div>
+                        <div class="stat-badge">
+                            <span>🔥</span>
+                            <span>5</span>
+                        </div>
                     </div>
+
+                    <div class="widget-timer">
+                        <div class="timer-ring-preview">
+                            <svg viewBox="0 0 140 140" width="140" height="140">
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#6366f1"/>
+                                        <stop offset="100%" stop-color="#8b5cf6"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="ring-bg" cx="70" cy="70" r="60"/>
+                                <circle class="ring-fill" cx="70" cy="70" r="60"/>
+                            </svg>
+                            <div class="timer-digits-preview">18:42</div>
+                        </div>
+                    </div>
+
+                    <button class="widget-btn-preview">⏸ Focusing...</button>
                 </div>
-                
-                <button class="modal-btn" id="modalClose">
-                    <span>Continue</span>
-                    <span class="btn-sparkle">✨</span>
-                </button>
             </div>
         </div>
+    </section>
 
-        <!-- Level Up Modal -->
-        <div class="modal-overlay hidden" id="levelUpModal">
-            <div class="modal-content level-up-content">
-                <div class="level-up-glow"></div>
-                <div class="level-up-icon">⭐</div>
-                <h2 class="modal-title">Level Up!</h2>
-                <p class="level-up-number">Level <span id="newLevel">2</span></p>
-                <p class="level-up-message">Keep focusing to unlock more achievements!</p>
-                <button class="modal-btn" id="levelUpClose">Amazing!</button>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>Everything You Need to Focus</h2>
+            <p>Scientifically-backed features designed to help you achieve flow state and get more done.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Binaural Beats</h3>
+                <p>Scientifically proven audio frequencies that synchronize your brainwaves for enhanced focus, creativity, or relaxation.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📌</div>
+                <h3>Always-On-Top Widget</h3>
+                <p>A beautiful floating timer that stays visible while you work in VS Code, Chrome, or any other app.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h3>Ambient Soundscapes</h3>
+                <p>Choose from rain, fireplace, forest, or ocean waves to create your perfect focus environment.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <h3>XP & Level System</h3>
+                <p>Earn XP for every focus session, level up, and unlock achievements. Gamification that actually works.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔥</div>
+                <h3>Streak Tracking</h3>
+                <p>Build daily streaks to stay consistent. The fear of breaking your streak is surprisingly motivating!</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Daily Challenges</h3>
+                <p>Complete daily focus challenges for bonus XP. New challenge every day to keep things fresh.</p>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Keyboard shortcuts hint -->
-    <div class="shortcuts-hint">
-        <span>Space: Start/Pause</span>
-        <span>R: Reset</span>
-        <span>M: Mute</span>
-    </div>
+    <!-- Download Section -->
+    <section class="download" id="download">
+        <div class="download-content">
+            <h2>Get FlowState Free</h2>
+            <p>Choose the version that works best for you. Both are completely free!</p>
 
-    <script src="script.js"></script>
+            <div class="download-options">
+                <!-- Desktop App -->
+                <div class="download-card featured">
+                    <div class="icon">🖥️</div>
+                    <h3>Desktop Widget</h3>
+                    <p>Always-on-top floating timer with system tray. Best experience!</p>
+                    <a href="https://github.com/ManojSwagath/flowstate/releases/latest/download/FlowState-Setup-1.0.0.exe" 
+                       class="btn btn-primary" 
+                       download>
+                        ⬇️ Download for Windows
+                    </a>
+                    <span class="download-size">Windows 10/11 • ~80 MB</span>
+                </div>
+
+                <!-- Web App -->
+                <div class="download-card">
+                    <div class="icon">🌐</div>
+                    <h3>Web App</h3>
+                    <p>Use instantly in your browser. No download required!</p>
+                    <a href="app.html" class="btn btn-secondary">
+                        🚀 Open Web App
+                    </a>
+                    <span class="download-size">Works on any device</span>
+                </div>
+            </div>
+
+            <div class="download-note">
+                ⚠️ <strong>Windows SmartScreen Warning:</strong> Since we're a new app, Windows may show a warning. Click "More info" → "Run anyway" to install. The app is 100% open source!
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span>◉</span>
+                FlowState
+            </div>
+            <p>Made with 💜 for deep work enthusiasts</p>
+            <div class="footer-links">
+                <a href="https://github.com/ManojSwagath/flowstate" target="_blank">GitHub</a>
+                <a href="https://github.com/ManojSwagath/flowstate/issues" target="_blank">Report a Bug</a>
+                <a href="app.html">Web App</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

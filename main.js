@@ -109,7 +109,7 @@ function createMainWindow() {
         }
     });
     
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile('app.html');
     
     mainWindow.on('closed', () => {
         mainWindow = null;

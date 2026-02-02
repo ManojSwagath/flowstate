@@ -23,10 +23,10 @@
     "files": [
       "main.js",
       "widget.html",
+      "app.html",
       "index.html",
       "style.css",
       "script.js",
-      "landing.html",
       "icon.png",
       "package.json"
     ],
