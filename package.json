@@ -47,6 +47,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "FlowState"
-    }
+    },
+    "forceCodeSigning": false
   }
 }
