@@ -1,0 +1,52 @@
+{
+  "name": "flowstate",
+  "version": "1.0.0",
+  "description": "Focus Timer with Binaural Beats - Desktop Widget",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64"
+  },
+  "author": "FlowState",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.flowstate.focustimer",
+    "productName": "FlowState",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "widget.html",
+      "index.html",
+      "style.css",
+      "script.js",
+      "landing.html",
+      "icon.png",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FlowState"
+    }
+  }
+}

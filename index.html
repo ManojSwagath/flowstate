@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowState - Deep Focus Timer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Audio visualizer rings -->
+    <div class="visualizer" id="visualizer">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+    </div>
+
+    <!-- Floating Mini Timer Widget (Draggable) -->
+    <div class="mini-timer" id="miniTimer">
+        <div class="mini-timer-header" id="miniTimerHeader">
+            <span class="mini-timer-drag">⋮⋮</span>
+            <span class="mini-timer-title">FlowState</span>
+            <button class="mini-timer-close" id="miniTimerClose">−</button>
+        </div>
+        <div class="mini-timer-body">
+            <div class="mini-timer-ring">
+                <svg viewBox="0 0 60 60">
+                    <circle class="mini-ring-bg" cx="30" cy="30" r="26"/>
+                    <circle class="mini-ring-fill" id="miniProgressRing" cx="30" cy="30" r="26"/>
+                </svg>
+                <span class="mini-timer-display" id="miniTimerDisplay">25:00</span>
+            </div>
+            <div class="mini-timer-controls">
+                <button class="mini-btn mini-start" id="miniStartBtn">▶</button>
+                <button class="mini-btn mini-pause hidden" id="miniPauseBtn">⏸</button>
+                <button class="mini-btn mini-reset" id="miniResetBtn">↺</button>
+            </div>
+            <div class="mini-timer-status" id="miniTimerStatus">Ready</div>
+        </div>
+    </div>
+
+    <!-- Mini Timer Toggle Button (shows when mini timer is hidden) -->
+    <button class="mini-timer-toggle hidden" id="miniTimerToggle" title="Show Mini Timer">
+        <span>◉</span>
+    </button>
+
+    <!-- Achievement unlock notification -->
+    <div class="achievement-popup hidden" id="achievementPopup">
+        <div class="achievement-icon" id="achievementIcon">🏆</div>
+        <div class="achievement-info">
+            <span class="achievement-label">Achievement Unlocked!</span>
+            <span class="achievement-name" id="achievementName">First Focus</span>
+        </div>
+    </div>
+
+    <!-- XP gain notification -->
+    <div class="xp-popup hidden" id="xpPopup">+<span id="xpAmount">50</span> XP</div>
+
+    <div class="container">
+        <!-- Headphone reminder banner -->
+        <div class="headphone-banner" id="headphoneBanner">
+            <span class="headphone-icon">🎧</span>
+            <span class="headphone-text">Use headphones for the best binaural beats experience</span>
+            <button class="headphone-close" id="headphoneClose">✕</button>
+        </div>
+
+        <!-- Header with streak counter -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">◉</span>
+                <span class="logo-text">FlowState</span>
+            </div>
+            <div class="header-right">
+                <div class="level-badge" id="levelBadge">
+                    <span class="level-icon">⭐</span>
+                    <span class="level-number" id="levelNumber">1</span>
+                </div>
+                <div class="streak-badge" id="streakBadge">
+                    <span class="fire-icon">🔥</span>
+                    <span class="streak-count" id="streakCount">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- XP Progress Bar -->
+        <div class="xp-bar-container">
+            <div class="xp-bar">
+                <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+            </div>
+            <div class="xp-info">
+                <span class="xp-current" id="xpCurrent">0</span>
+                <span class="xp-separator">/</span>
+                <span class="xp-needed" id="xpNeeded">100</span>
+                <span class="xp-label">XP to Level <span id="nextLevel">2</span></span>
+            </div>
+        </div>
+
+        <!-- Daily Challenge Card -->
+        <div class="daily-challenge" id="dailyChallenge">
+            <div class="challenge-header">
+                <span class="challenge-icon">🎯</span>
+                <span class="challenge-title">Daily Challenge</span>
+                <span class="challenge-reward">+100 XP</span>
+            </div>
+            <p class="challenge-text" id="challengeText">Complete 3 focus sessions today</p>
+            <div class="challenge-progress">
+                <div class="challenge-bar">
+                    <div class="challenge-fill" id="challengeFill" style="width: 0%"></div>
+                </div>
+                <span class="challenge-count" id="challengeCount">0/3</span>
+            </div>
+        </div>
+
+        <!-- Main card -->
+        <main class="main-card">
+            <!-- Task input with floating label -->
+            <div class="task-input-wrapper">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    class="task-input" 
+                    placeholder=" "
+                    maxlength="50"
+                >
+                <label class="task-label">What are you working on? (optional)</label>
+                <div class="input-glow"></div>
+            </div>
+
+            <!-- Timer display -->
+            <div class="timer-container">
+                <div class="timer-ring" id="timerRing">
+                    <svg class="progress-ring" viewBox="0 0 200 200">
+                        <circle class="progress-ring-bg" cx="100" cy="100" r="90"/>
+                        <circle class="progress-ring-fill" id="progressRing" cx="100" cy="100" r="90"/>
+                    </svg>
+                    <div class="timer-display">
+                        <span class="timer-digits" id="timerDisplay">25:00</span>
+                        <span class="timer-status" id="timerStatus">Ready to focus</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motivational message during focus -->
+            <div class="focus-message hidden" id="focusMessage">
+                <span class="message-text" id="messageText">You're doing great! Keep going!</span>
+            </div>
+
+            <!-- Preset buttons -->
+            <div class="presets">
+                <button class="preset-btn active" data-time="25">
+                    <span class="preset-time">25</span>
+                    <span class="preset-label">min</span>
+                </button>
+                <button class="preset-btn" data-time="45">
+                    <span class="preset-time">45</span>
+                    <span class="preset-label">min</span>
+                </button>
+                <button class="preset-btn" data-time="60">
+                    <span class="preset-time">60</span>
+                    <span class="preset-label">min</span>
+                </button>
+                <div class="custom-time-wrapper">
+                    <input 
+                        type="number" 
+                        id="customTime" 
+                        class="custom-time" 
+                        placeholder="?"
+                        min="1" 
+                        max="180"
+                    >
+                    <span class="custom-label">min</span>
+                </div>
+            </div>
+
+            <!-- Binaural mode selector -->
+            <div class="mode-selector">
+                <label class="mode-label">
+                    <span class="brain-icon">🧠</span>
+                    Brain Mode
+                </label>
+                <div class="mode-dropdown-wrapper">
+                    <select id="binauralMode" class="mode-dropdown">
+                        <option value="10">⚡ Focus (10 Hz) - Alpha waves</option>
+                        <option value="16">🚀 Deep Work (16 Hz) - Beta waves</option>
+                        <option value="6">🌊 Chill (6 Hz) - Theta waves</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Ambient Sound Selector -->
+            <div class="ambient-selector">
+                <label class="mode-label">
+                    <span class="ambient-icon">🎵</span>
+                    Ambient Sound
+                </label>
+                <div class="ambient-buttons">
+                    <button class="ambient-btn active" data-sound="none" title="None">
+                        <span>🔇</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="rain" title="Rain">
+                        <span>🌧️</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="fire" title="Fireplace">
+                        <span>🔥</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="forest" title="Forest">
+                        <span>🌲</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="waves" title="Ocean">
+                        <span>🌊</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Volume control -->
+            <div class="volume-control">
+                <span class="volume-icon" id="volumeIcon">🔉</span>
+                <input 
+                    type="range" 
+                    id="volumeSlider" 
+                    class="volume-slider" 
+                    min="0" 
+                    max="100" 
+                    value="20"
+                >
+                <span class="volume-value" id="volumeValue">20%</span>
+            </div>
+
+            <!-- Control buttons -->
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">
+                    <span class="btn-icon">▶</span>
+                    <span class="btn-text">Start Focus</span>
+                </button>
+                <button class="control-btn pause-btn hidden" id="pauseBtn">
+                    <span class="btn-icon">⏸</span>
+                    <span class="btn-text">Pause</span>
+                </button>
+                <button class="control-btn reset-btn" id="resetBtn">
+                    <span class="btn-icon">↺</span>
+                    <span class="btn-text">Reset</span>
+                </button>
+            </div>
+        </main>
+
+        <!-- Stats section -->
+        <section class="stats-section">
+            <h3 class="stats-title">Today's Progress</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="sessionsToday">0</span>
+                    <span class="stat-label">Sessions</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="minutesToday">0</span>
+                    <span class="stat-label">Minutes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="focusScore">0</span>
+                    <span class="stat-label">Focus Score</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section class="achievements-section">
+            <h3 class="stats-title">
+                <span>🏆 Achievements</span>
+                <span class="achievement-counter" id="achievementCounter">0/12</span>
+            </h3>
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Achievements populated by JS -->
+            </div>
+        </section>
+
+        <!-- Session History -->
+        <section class="history-section">
+            <h3 class="stats-title">📜 Recent Sessions</h3>
+            <div class="history-list" id="historyList">
+                <p class="history-empty">Complete your first session to see history</p>
+            </div>
+        </section>
+
+        <!-- Motivational quotes -->
+        <div class="quote-container" id="quoteContainer">
+            <p class="quote-text" id="quoteText">"The successful warrior is the average man, with laser-like focus."</p>
+            <span class="quote-author" id="quoteAuthor">— Bruce Lee</span>
+        </div>
+
+        <!-- Session complete modal -->
+        <div class="modal-overlay hidden" id="completeModal">
+            <div class="modal-content">
+                <div class="confetti" id="confetti"></div>
+                <div class="celebration">🎉</div>
+                <h2 class="modal-title">Session Complete!</h2>
+                <p class="modal-message" id="modalMessage">You focused for 25 minutes</p>
+                
+                <div class="modal-xp-gain">
+                    <span class="xp-gained" id="xpGained">+75 XP</span>
+                </div>
+                
+                <div class="modal-stats-row">
+                    <div class="modal-stat">
+                        <span class="modal-stat-value" id="modalSessions">1</span>
+                        <span class="modal-stat-label">Sessions today</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-value" id="modalStreak">1</span>
+                        <span class="modal-stat-label">Day streak</span>
+                    </div>
+                </div>
+                
+                <button class="modal-btn" id="modalClose">
+                    <span>Continue</span>
+                    <span class="btn-sparkle">✨</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Level Up Modal -->
+        <div class="modal-overlay hidden" id="levelUpModal">
+            <div class="modal-content level-up-content">
+                <div class="level-up-glow"></div>
+                <div class="level-up-icon">⭐</div>
+                <h2 class="modal-title">Level Up!</h2>
+                <p class="level-up-number">Level <span id="newLevel">2</span></p>
+                <p class="level-up-message">Keep focusing to unlock more achievements!</p>
+                <button class="modal-btn" id="levelUpClose">Amazing!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard shortcuts hint -->
+    <div class="shortcuts-hint">
+        <span>Space: Start/Pause</span>
+        <span>R: Reset</span>
+        <span>M: Mute</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

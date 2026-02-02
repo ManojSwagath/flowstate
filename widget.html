@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowState Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: #1a1a24;
+            --bg-secondary: #12121a;
+            --accent-primary: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --accent-warning: #f59e0b;
+            --accent-success: #22c55e;
+            --accent-xp: #a855f7;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        .widget {
+            width: 260px;
+            background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1),
+                        0 0 30px rgba(99, 102, 241, 0.2);
+            overflow: hidden;
+        }
+        
+        /* Title Bar - Draggable */
+        .title-bar {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: move;
+            -webkit-app-region: drag;
+        }
+        
+        .title-bar-buttons {
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+        
+        .title-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .title-btn:hover {
+            opacity: 0.8;
+        }
+        
+        .btn-close {
+            background: #ff5f57;
+        }
+        
+        .btn-minimize {
+            background: #febc2e;
+        }
+        
+        .btn-expand {
+            background: #28c840;
+        }
+        
+        .title-text {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        /* Widget Body */
+        .widget-body {
+            padding: 20px;
+        }
+        
+        /* Level & Streak Row */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: #000;
+        }
+        
+        .streak-badge {
+            background: var(--bg-secondary);
+            color: var(--accent-warning);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .badge-icon {
+            font-size: 14px;
+        }
+        
+        /* Timer Ring */
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .timer-ring {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        
+        .timer-ring svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        
+        .ring-bg {
+            fill: none;
+            stroke: var(--bg-secondary);
+            stroke-width: 8;
+        }
+        
+        .ring-fill {
+            fill: none;
+            stroke: var(--accent-primary);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.5s ease;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+        
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .timer-digits {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .timer-status {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .widget.active .timer-digits {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px var(--accent-glow)); }
+            to { filter: drop-shadow(0 0 15px var(--accent-glow)); }
+        }
+        
+        /* Presets */
+        .presets {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .preset-btn {
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent-primary);
+        }
+        
+        .preset-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+        
+        /* Mode Selector */
+        .mode-selector {
+            margin-bottom: 12px;
+        }
+        
+        .mode-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .mode-dropdown {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 12px;
+            cursor: pointer;
+            appearance: none;
+        }
+        
+        .mode-dropdown:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Ambient Sounds */
+        .ambient-section {
+            margin-bottom: 16px;
+        }
+        
+        .ambient-sounds {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .ambient-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .ambient-btn span {
+            font-size: 9px;
+        }
+        
+        .ambient-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        .ambient-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        
+        /* Volume Slider */
+        .volume-section {
+            margin-bottom: 16px;
+        }
+        
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .volume-icon {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .volume-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px var(--accent-glow);
+        }
+        
+        .pause-btn {
+            background: var(--accent-warning);
+            color: #000;
+        }
+        
+        .reset-btn {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            flex: 0.4;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* XP Bar */
+        .xp-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .xp-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+        
+        .xp-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        
+        .xp-current {
+            color: var(--accent-xp);
+            font-weight: 600;
+        }
+        
+        /* Sessions today */
+        .sessions-today {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .session-stat {
+            text-align: center;
+        }
+        
+        .session-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+        
+        .session-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Headphone reminder */
+        .headphone-tip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 8px;
+            background: rgba(99, 179, 237, 0.1);
+            border-radius: 8px;
+            font-size: 10px;
+            color: #93c5fd;
+        }
+        
+        .headphone-tip.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget" id="widget">
+        <!-- macOS-style title bar -->
+        <div class="title-bar" id="titleBar">
+            <div class="title-bar-buttons">
+                <button class="title-btn btn-close" id="closeBtn" title="Quit"></button>
+                <button class="title-btn btn-minimize" id="minimizeBtn" title="Minimize"></button>
+                <button class="title-btn btn-expand" id="expandBtn" title="Open Full App"></button>
+            </div>
+            <span class="title-text">FlowState</span>
+        </div>
+        
+        <div class="widget-body">
+            <!-- Level & Streak -->
+            <div class="stats-row">
+                <div class="badge level-badge">
+                    <span class="badge-icon">⭐</span>
+                    <span id="levelDisplay">1</span>
+                </div>
+                <div class="badge streak-badge">
+                    <span class="badge-icon">🔥</span>
+                    <span id="streakDisplay">0</span>
+                </div>
+            </div>
+            
+            <!-- Timer Ring -->
+            <div class="timer-container">
+                <div class="timer-ring">
+                    <svg viewBox="0 0 140 140">
+                        <circle class="ring-bg" cx="70" cy="70" r="60"/>
+                        <circle class="ring-fill" id="progressRing" cx="70" cy="70" r="60"/>
+                    </svg>
+                    <div class="timer-display">
+                        <div class="timer-digits" id="timerDisplay">25:00</div>
+                        <div class="timer-status" id="timerStatus">Ready</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Presets -->
+            <div class="presets">
+                <button class="preset-btn active" data-time="25">25m</button>
+                <button class="preset-btn" data-time="45">45m</button>
+                <button class="preset-btn" data-time="60">60m</button>
+            </div>
+            
+            <!-- Brain Mode -->
+            <div class="mode-selector">
+                <div class="mode-label">
+                    <span>🧠</span>
+                    Brain Mode
+                </div>
+                <select class="mode-dropdown" id="binauralMode">
+                    <option value="10">⚡ Focus (10 Hz)</option>
+                    <option value="16">🚀 Deep Work (16 Hz)</option>
+                    <option value="6">🌊 Chill (6 Hz)</option>
+                </select>
+            </div>
+            
+            <!-- Ambient Sounds -->
+            <div class="ambient-section">
+                <div class="mode-label">
+                    <span>🎵</span>
+                    Ambient Sound
+                </div>
+                <div class="ambient-sounds">
+                    <button class="ambient-btn" data-sound="rain" title="Rain">
+                        🌧️
+                        <span>Rain</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="fire" title="Fireplace">
+                        🔥
+                        <span>Fire</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="forest" title="Forest">
+                        🌲
+                        <span>Forest</span>
+                    </button>
+                    <button class="ambient-btn" data-sound="waves" title="Ocean Waves">
+                        🌊
+                        <span>Waves</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Volume Control -->
+            <div class="volume-section">
+                <div class="volume-row">
+                    <span class="volume-icon">🔈</span>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="15">
+                    <span class="volume-icon">🔊</span>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <button class="control-btn start-btn" id="startBtn">
+                    <span>▶</span> Start
+                </button>
+                <button class="control-btn pause-btn hidden" id="pauseBtn">
+                    <span>⏸</span> Pause
+                </button>
+                <button class="control-btn reset-btn" id="resetBtn">↺</button>
+            </div>
+            
+            <!-- XP Progress -->
+            <div class="xp-section">
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                </div>
+                <div class="xp-info">
+                    <span><span class="xp-current" id="xpCurrent">0</span> / <span id="xpNeeded">100</span> XP</span>
+                    <span>Level <span id="nextLevel">2</span></span>
+                </div>
+            </div>
+            
+            <!-- Sessions Today -->
+            <div class="sessions-today">
+                <div class="session-stat">
+                    <div class="session-value" id="sessionsToday">0</div>
+                    <div class="session-label">Sessions</div>
+                </div>
+                <div class="session-stat">
+                    <div class="session-value" id="minutesToday">0</div>
+                    <div class="session-label">Minutes</div>
+                </div>
+            </div>
+            
+            <!-- Headphone Tip -->
+            <div class="headphone-tip" id="headphoneTip">
+                🎧 Use headphones for binaural beats
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        // ============================================
+        // State
+        // ============================================
+        const state = {
+            duration: 25 * 60,
+            timeRemaining: 25 * 60,
+            isRunning: false,
+            isPaused: false,
+            timerInterval: null,
+            
+            // Audio
+            audioContext: null,
+            leftOscillator: null,
+            rightOscillator: null,
+            leftGain: null,
+            rightGain: null,
+            masterGain: null,
+            isAudioPlaying: false,
+            volume: 0.15,
+            baseFrequency: 432,
+            binauralDifference: 10,
+            
+            // Ambient
+            ambientSound: null,
+            ambientGain: null,
+            ambientNodes: [],
+            
+            // Stats
+            xp: 0,
+            level: 1,
+            xpToNextLevel: 100,
+            sessionsToday: 0,
+            minutesToday: 0,
+            totalSessions: 0,
+            totalMinutes: 0,
+            currentStreak: 0,
+            lastSessionDate: null
+        };
+        
+        // ============================================
+        // DOM Elements
+        // ============================================
+        const widget = document.getElementById('widget');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timerStatus = document.getElementById('timerStatus');
+        const progressRing = document.getElementById('progressRing');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        const binauralMode = document.getElementById('binauralMode');
+        
+        const levelDisplay = document.getElementById('levelDisplay');
+        const streakDisplay = document.getElementById('streakDisplay');
+        const xpFill = document.getElementById('xpFill');
+        const xpCurrent = document.getElementById('xpCurrent');
+        const xpNeeded = document.getElementById('xpNeeded');
+        const nextLevel = document.getElementById('nextLevel');
+        const sessionsToday = document.getElementById('sessionsToday');
+        const minutesToday = document.getElementById('minutesToday');
+        
+        // ============================================
+        // Window Dragging
+        // ============================================
+        const titleBar = document.getElementById('titleBar');
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        
+        titleBar.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('title-btn')) return;
+            isDragging = true;
+            dragOffset.x = e.clientX;
+            dragOffset.y = e.clientY;
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const x = e.screenX - dragOffset.x;
+            const y = e.screenY - dragOffset.y;
+            
+            ipcRenderer.send('window-move', { x, y });
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // ============================================
+        // Title Bar Buttons
+        // ============================================
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            ipcRenderer.send('close-widget');
+        });
+        
+        document.getElementById('minimizeBtn').addEventListener('click', () => {
+            ipcRenderer.send('minimize-widget');
+        });
+        
+        document.getElementById('expandBtn').addEventListener('click', () => {
+            ipcRenderer.send('show-main');
+        });
+        
+        // ============================================
+        // Timer Controls
+        // ============================================
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const minutes = parseInt(btn.dataset.time);
+                state.duration = minutes * 60;
+                state.timeRemaining = state.duration;
+                updateDisplay();
+            });
+        });
+        
+        binauralMode.addEventListener('change', (e) => {
+            state.binauralDifference = parseInt(e.target.value);
+            if (state.isAudioPlaying && state.rightOscillator) {
+                state.rightOscillator.frequency.value = state.baseFrequency + state.binauralDifference;
+            }
+        });
+        
+        // Ambient sound buttons
+        const ambientBtns = document.querySelectorAll('.ambient-btn');
+        ambientBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sound = btn.dataset.sound;
+                
+                if (btn.classList.contains('active')) {
+                    btn.classList.remove('active');
+                    stopAmbientSound();
+                    state.ambientSound = null;
+                } else {
+                    ambientBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.ambientSound = sound;
+                    
+                    if (state.isRunning) {
+                        startAmbientSound(sound);
+                    }
+                }
+            });
+        });
+        
+        // Volume slider
+        const volumeSlider = document.getElementById('volumeSlider');
+        volumeSlider.addEventListener('input', (e) => {
+            state.volume = e.target.value / 100;
+            if (state.masterGain) {
+                state.masterGain.gain.value = state.volume;
+            }
+            if (state.ambientGain) {
+                state.ambientGain.gain.value = state.volume * 0.8;
+            }
+        });
+        
+        // ============================================
+        // Timer Functions
+        // ============================================
+        function startTimer() {
+            if (state.timeRemaining <= 0) return;
+            
+            state.isRunning = true;
+            state.isPaused = false;
+            
+            startBtn.classList.add('hidden');
+            pauseBtn.classList.remove('hidden');
+            widget.classList.add('active');
+            timerStatus.textContent = 'Focusing...';
+            
+            startBinauralBeats();
+            
+            // Start ambient sound if selected
+            if (state.ambientSound) {
+                startAmbientSound(state.ambientSound);
+            }
+            
+            state.timerInterval = setInterval(() => {
+                state.timeRemaining--;
+                updateDisplay();
+                
+                if (state.timeRemaining <= 0) {
+                    completeSession();
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            state.isRunning = false;
+            state.isPaused = true;
+            
+            clearInterval(state.timerInterval);
+            
+            pauseBtn.classList.add('hidden');
+            startBtn.classList.remove('hidden');
+            startBtn.innerHTML = '<span>▶</span> Resume';
+            widget.classList.remove('active');
+            timerStatus.textContent = 'Paused';
+            
+            fadeOutAudio();
+            stopAmbientSound();
+        }
+        
+        function resetTimer() {
+            state.isRunning = false;
+            state.isPaused = false;
+            state.timeRemaining = state.duration;
+            
+            clearInterval(state.timerInterval);
+            
+            pauseBtn.classList.add('hidden');
+            startBtn.classList.remove('hidden');
+            startBtn.innerHTML = '<span>▶</span> Start';
+            widget.classList.remove('active');
+            timerStatus.textContent = 'Ready';
+            
+            stopBinauralBeats();
+            stopAmbientSound();
+            updateDisplay();
+        }
+        
+        function completeSession() {
+            clearInterval(state.timerInterval);
+            state.isRunning = false;
+            
+            const sessionMinutes = Math.round(state.duration / 60);
+            const xpEarned = sessionMinutes * 3 + (sessionMinutes >= 25 ? 10 : 0);
+            
+            state.sessionsToday++;
+            state.minutesToday += sessionMinutes;
+            state.totalSessions++;
+            state.totalMinutes += sessionMinutes;
+            state.lastSessionDate = new Date().toDateString();
+            
+            addXP(xpEarned);
+            updateStreak();
+            saveState();
+            updateStatsDisplay();
+            
+            stopBinauralBeats();
+            stopAmbientSound();
+            playCompletionSound();
+            
+            // Reset UI
+            pauseBtn.classList.add('hidden');
+            startBtn.classList.remove('hidden');
+            startBtn.innerHTML = '<span>▶</span> Start';
+            widget.classList.remove('active');
+            timerStatus.textContent = '🎉 Complete!';
+            
+            // Reset timer after delay
+            setTimeout(() => {
+                state.timeRemaining = state.duration;
+                updateDisplay();
+                timerStatus.textContent = 'Ready';
+            }, 3000);
+        }
+        
+        // ============================================
+        // Display Updates
+        // ============================================
+        function updateDisplay() {
+            const minutes = Math.floor(state.timeRemaining / 60);
+            const seconds = state.timeRemaining % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update progress ring
+            const circumference = 2 * Math.PI * 60;
+            const progress = state.timeRemaining / state.duration;
+            const offset = circumference * (1 - progress);
+            progressRing.style.strokeDasharray = circumference;
+            progressRing.style.strokeDashoffset = offset;
+        }
+        
+        function updateStatsDisplay() {
+            levelDisplay.textContent = state.level;
+            streakDisplay.textContent = state.currentStreak;
+            xpCurrent.textContent = state.xp;
+            xpNeeded.textContent = state.xpToNextLevel;
+            nextLevel.textContent = state.level + 1;
+            xpFill.style.width = `${(state.xp / state.xpToNextLevel) * 100}%`;
+            sessionsToday.textContent = state.sessionsToday;
+            minutesToday.textContent = state.minutesToday;
+        }
+        
+        // ============================================
+        // XP & Level System
+        // ============================================
+        function addXP(amount) {
+            state.xp += amount;
+            
+            while (state.xp >= state.xpToNextLevel) {
+                state.xp -= state.xpToNextLevel;
+                state.level++;
+                state.xpToNextLevel = Math.round(100 * Math.pow(1.3, state.level - 1));
+            }
+            
+            updateStatsDisplay();
+        }
+        
+        function updateStreak() {
+            const today = new Date().toDateString();
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            
+            if (state.lastSessionDate === yesterday) {
+                state.currentStreak++;
+            } else if (state.lastSessionDate !== today) {
+                state.currentStreak = 1;
+            }
+        }
+        
+        // ============================================
+        // Binaural Beats
+        // ============================================
+        function startBinauralBeats() {
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            if (state.audioContext.state === 'suspended') {
+                state.audioContext.resume();
+            }
+            
+            const leftPanner = state.audioContext.createStereoPanner();
+            const rightPanner = state.audioContext.createStereoPanner();
+            leftPanner.pan.value = -1;
+            rightPanner.pan.value = 1;
+            
+            state.leftGain = state.audioContext.createGain();
+            state.rightGain = state.audioContext.createGain();
+            state.masterGain = state.audioContext.createGain();
+            
+            state.leftGain.gain.value = 0;
+            state.rightGain.gain.value = 0;
+            state.masterGain.gain.value = state.volume;
+            
+            state.leftOscillator = state.audioContext.createOscillator();
+            state.rightOscillator = state.audioContext.createOscillator();
+            
+            state.leftOscillator.frequency.value = state.baseFrequency;
+            state.rightOscillator.frequency.value = state.baseFrequency + state.binauralDifference;
+            
+            state.leftOscillator.type = 'sine';
+            state.rightOscillator.type = 'sine';
+            
+            state.leftOscillator.connect(state.leftGain);
+            state.leftGain.connect(leftPanner);
+            leftPanner.connect(state.masterGain);
+            
+            state.rightOscillator.connect(state.rightGain);
+            state.rightGain.connect(rightPanner);
+            rightPanner.connect(state.masterGain);
+            
+            state.masterGain.connect(state.audioContext.destination);
+            
+            state.leftOscillator.start();
+            state.rightOscillator.start();
+            
+            const now = state.audioContext.currentTime;
+            state.leftGain.gain.linearRampToValueAtTime(1, now + 5);
+            state.rightGain.gain.linearRampToValueAtTime(1, now + 5);
+            
+            state.isAudioPlaying = true;
+        }
+        
+        function fadeOutAudio() {
+            if (!state.isAudioPlaying || !state.audioContext) return;
+            
+            const now = state.audioContext.currentTime;
+            if (state.leftGain) state.leftGain.gain.linearRampToValueAtTime(0, now + 2);
+            if (state.rightGain) state.rightGain.gain.linearRampToValueAtTime(0, now + 2);
+            
+            setTimeout(stopOscillators, 2000);
+        }
+        
+        function stopOscillators() {
+            if (state.leftOscillator) {
+                state.leftOscillator.stop();
+                state.leftOscillator = null;
+            }
+            if (state.rightOscillator) {
+                state.rightOscillator.stop();
+                state.rightOscillator = null;
+            }
+            state.isAudioPlaying = false;
+        }
+        
+        function stopBinauralBeats() {
+            fadeOutAudio();
+        }
+        
+        // ============================================
+        // Ambient Sounds (Synthesized)
+        // ============================================
+        function startAmbientSound(type) {
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            stopAmbientSound();
+            
+            state.ambientGain = state.audioContext.createGain();
+            state.ambientGain.gain.value = 0;
+            state.ambientGain.connect(state.audioContext.destination);
+            
+            switch(type) {
+                case 'rain':
+                    createRainSound();
+                    break;
+                case 'fire':
+                    createFireSound();
+                    break;
+                case 'forest':
+                    createForestSound();
+                    break;
+                case 'waves':
+                    createWavesSound();
+                    break;
+            }
+            
+            // Fade in
+            const now = state.audioContext.currentTime;
+            state.ambientGain.gain.linearRampToValueAtTime(state.volume * 0.8, now + 2);
+        }
+        
+        function stopAmbientSound() {
+            if (state.ambientGain) {
+                const now = state.audioContext.currentTime;
+                state.ambientGain.gain.linearRampToValueAtTime(0, now + 1);
+            }
+            
+            setTimeout(() => {
+                state.ambientNodes.forEach(node => {
+                    try { node.stop(); } catch(e) {}
+                    try { node.disconnect(); } catch(e) {}
+                });
+                state.ambientNodes = [];
+            }, 1100);
+        }
+        
+        function createNoiseBuffer(seconds = 2) {
+            const bufferSize = state.audioContext.sampleRate * seconds;
+            const buffer = state.audioContext.createBuffer(1, bufferSize, state.audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            return buffer;
+        }
+        
+        function createRainSound() {
+            // Brown noise for rain
+            const noise = state.audioContext.createBufferSource();
+            noise.buffer = createNoiseBuffer(2);
+            noise.loop = true;
+            
+            const lowpass = state.audioContext.createBiquadFilter();
+            lowpass.type = 'lowpass';
+            lowpass.frequency.value = 400;
+            
+            const highpass = state.audioContext.createBiquadFilter();
+            highpass.type = 'highpass';
+            highpass.frequency.value = 50;
+            
+            noise.connect(lowpass);
+            lowpass.connect(highpass);
+            highpass.connect(state.ambientGain);
+            
+            noise.start();
+            state.ambientNodes.push(noise);
+            
+            // Add some higher frequency rain drops
+            const rainDrops = state.audioContext.createBufferSource();
+            rainDrops.buffer = createNoiseBuffer(3);
+            rainDrops.loop = true;
+            
+            const bandpass = state.audioContext.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.frequency.value = 2000;
+            bandpass.Q.value = 0.5;
+            
+            const rainGain = state.audioContext.createGain();
+            rainGain.gain.value = 0.3;
+            
+            rainDrops.connect(bandpass);
+            bandpass.connect(rainGain);
+            rainGain.connect(state.ambientGain);
+            
+            rainDrops.start();
+            state.ambientNodes.push(rainDrops);
+        }
+        
+        function createFireSound() {
+            // Crackling fire with filtered noise
+            const noise = state.audioContext.createBufferSource();
+            noise.buffer = createNoiseBuffer(2);
+            noise.loop = true;
+            
+            const lowpass = state.audioContext.createBiquadFilter();
+            lowpass.type = 'lowpass';
+            lowpass.frequency.value = 200;
+            
+            // LFO for crackling effect
+            const lfo = state.audioContext.createOscillator();
+            lfo.frequency.value = 3 + Math.random() * 5;
+            
+            const lfoGain = state.audioContext.createGain();
+            lfoGain.gain.value = 150;
+            
+            lfo.connect(lfoGain);
+            lfoGain.connect(lowpass.frequency);
+            
+            noise.connect(lowpass);
+            lowpass.connect(state.ambientGain);
+            
+            noise.start();
+            lfo.start();
+            state.ambientNodes.push(noise, lfo);
+            
+            // Add pops and crackles
+            const crackle = state.audioContext.createBufferSource();
+            crackle.buffer = createNoiseBuffer(4);
+            crackle.loop = true;
+            
+            const crackleFilter = state.audioContext.createBiquadFilter();
+            crackleFilter.type = 'highpass';
+            crackleFilter.frequency.value = 1000;
+            
+            const crackleGain = state.audioContext.createGain();
+            crackleGain.gain.value = 0.15;
+            
+            crackle.connect(crackleFilter);
+            crackleFilter.connect(crackleGain);
+            crackleGain.connect(state.ambientGain);
+            
+            crackle.start();
+            state.ambientNodes.push(crackle);
+        }
+        
+        function createForestSound() {
+            // Wind through trees
+            const wind = state.audioContext.createBufferSource();
+            wind.buffer = createNoiseBuffer(3);
+            wind.loop = true;
+            
+            const windFilter = state.audioContext.createBiquadFilter();
+            windFilter.type = 'lowpass';
+            windFilter.frequency.value = 500;
+            
+            const windLfo = state.audioContext.createOscillator();
+            windLfo.frequency.value = 0.2;
+            
+            const windLfoGain = state.audioContext.createGain();
+            windLfoGain.gain.value = 200;
+            
+            windLfo.connect(windLfoGain);
+            windLfoGain.connect(windFilter.frequency);
+            
+            wind.connect(windFilter);
+            windFilter.connect(state.ambientGain);
+            
+            wind.start();
+            windLfo.start();
+            state.ambientNodes.push(wind, windLfo);
+            
+            // Bird chirps
+            function createBirdChirp() {
+                if (!state.ambientGain) return;
+                
+                const osc = state.audioContext.createOscillator();
+                const gain = state.audioContext.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.value = 2000 + Math.random() * 2000;
+                
+                const now = state.audioContext.currentTime;
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                
+                osc.frequency.linearRampToValueAtTime(osc.frequency.value * 1.2, now + 0.08);
+                osc.frequency.linearRampToValueAtTime(osc.frequency.value * 0.9, now + 0.15);
+                
+                osc.connect(gain);
+                gain.connect(state.ambientGain);
+                
+                osc.start(now);
+                osc.stop(now + 0.2);
+                
+                setTimeout(createBirdChirp, 3000 + Math.random() * 8000);
+            }
+            
+            setTimeout(createBirdChirp, 2000);
+        }
+        
+        function createWavesSound() {
+            // Ocean waves with rhythmic LFO
+            const noise = state.audioContext.createBufferSource();
+            noise.buffer = createNoiseBuffer(4);
+            noise.loop = true;
+            
+            const filter = state.audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 300;
+            
+            // Wave rhythm LFO
+            const lfo = state.audioContext.createOscillator();
+            lfo.frequency.value = 0.08;
+            
+            const lfoGain = state.audioContext.createGain();
+            lfoGain.gain.value = 200;
+            
+            lfo.connect(lfoGain);
+            lfoGain.connect(filter.frequency);
+            
+            // Volume LFO for wave motion
+            const volLfo = state.audioContext.createOscillator();
+            volLfo.frequency.value = 0.08;
+            
+            const volLfoGain = state.audioContext.createGain();
+            volLfoGain.gain.value = 0.3;
+            
+            const waveGain = state.audioContext.createGain();
+            waveGain.gain.value = 0.7;
+            
+            volLfo.connect(volLfoGain);
+            volLfoGain.connect(waveGain.gain);
+            
+            noise.connect(filter);
+            filter.connect(waveGain);
+            waveGain.connect(state.ambientGain);
+            
+            noise.start();
+            lfo.start();
+            volLfo.start();
+            state.ambientNodes.push(noise, lfo, volLfo);
+        }
+        
+        function playCompletionSound() {
+            if (!state.audioContext) return;
+            
+            const oscillator = state.audioContext.createOscillator();
+            const gain = state.audioContext.createGain();
+            
+            oscillator.connect(gain);
+            gain.connect(state.audioContext.destination);
+            oscillator.type = 'sine';
+            
+            const now = state.audioContext.currentTime;
+            oscillator.frequency.setValueAtTime(523.25, now);
+            oscillator.frequency.setValueAtTime(659.25, now + 0.15);
+            oscillator.frequency.setValueAtTime(783.99, now + 0.3);
+            oscillator.frequency.setValueAtTime(1046.50, now + 0.45);
+            
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.8);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.8);
+        }
+        
+        // ============================================
+        // Persistence
+        // ============================================
+        function saveState() {
+            const data = {
+                xp: state.xp,
+                level: state.level,
+                xpToNextLevel: state.xpToNextLevel,
+                sessionsToday: state.sessionsToday,
+                minutesToday: state.minutesToday,
+                totalSessions: state.totalSessions,
+                totalMinutes: state.totalMinutes,
+                currentStreak: state.currentStreak,
+                lastSessionDate: state.lastSessionDate
+            };
+            localStorage.setItem('flowstate-widget', JSON.stringify(data));
+        }
+        
+        function loadState() {
+            const saved = localStorage.getItem('flowstate-widget');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.assign(state, data);
+                
+                // Reset daily stats if new day
+                const today = new Date().toDateString();
+                if (state.lastSessionDate !== today) {
+                    state.sessionsToday = 0;
+                    state.minutesToday = 0;
+                }
+            }
+            updateStatsDisplay();
+        }
+        
+        // ============================================
+        // Initialize
+        // ============================================
+        loadState();
+        updateDisplay();
+    </script>
+</body>
+</html>
