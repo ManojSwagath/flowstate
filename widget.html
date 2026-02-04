@@ -30,19 +30,19 @@
             background: transparent;
             overflow: hidden;
             user-select: none;
+            cursor: grab;
         }
         
         /* ============================================
            BASE WIDGET + OPACITY CONTROL
            ============================================ */
         .widget {
-            background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
-                        0 0 0 1px rgba(255, 255, 255, 0.1),
-                        0 0 30px rgba(99, 102, 241, 0.2);
+            background: linear-gradient(135deg, #14142a 0%, #0f0f1a 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
             transition: all 0.3s ease, opacity 0.2s;
+            position: relative;
         }
         
         /* Opacity levels - becomes solid on hover */
@@ -55,10 +55,10 @@
            MODE: MINI - Ultra compact (just timer)
            ============================================ */
         .widget.mode-mini {
-            width: 130px;
-            border-radius: 12px;
+            width: 110px;
+            border-radius: 16px;
         }
-        .widget.mode-mini .title-bar { padding: 5px 8px; }
+        .widget.mode-mini .title-bar { padding: 4px 6px; }
         .widget.mode-mini .title-text { display: none; }
         .widget.mode-mini .widget-body { padding: 8px; }
         .widget.mode-mini .stats-row,
@@ -70,12 +70,15 @@
         .widget.mode-mini .sessions-today,
         .widget.mode-mini .headphone-tip,
         .widget.mode-mini .reset-btn { display: none !important; }
-        .widget.mode-mini .timer-container { margin-bottom: 8px; }
-        .widget.mode-mini .timer-ring { width: 70px; height: 70px; }
-        .widget.mode-mini .timer-digits { font-size: 18px; }
-        .widget.mode-mini .timer-status { font-size: 8px; }
-        .widget.mode-mini .controls { gap: 4px; }
-        .widget.mode-mini .control-btn { padding: 8px 10px; font-size: 11px; gap: 3px; }
+        .widget.mode-mini .timer-container { margin-bottom: 6px; }
+        .widget.mode-mini .timer-ring { width: 75px; height: 75px; }
+        .widget.mode-mini .timer-digits { font-size: 20px; }
+        .widget.mode-mini .timer-status { display: none; }
+        .widget.mode-mini .controls { gap: 0; }
+        .widget.mode-mini .control-btn { padding: 6px 8px; font-size: 16px; background: transparent; box-shadow: none; }
+        .widget.mode-mini .control-btn span { display: none; }
+        .widget.mode-mini .start-btn { color: var(--accent-primary); }
+        .widget.mode-mini .pause-btn { color: var(--accent-warning); background: transparent; }
         .widget.mode-mini .mode-switcher { gap: 2px; }
         
         /* ============================================
@@ -83,6 +86,7 @@
            ============================================ */
         .widget.mode-compact {
             width: 180px;
+            border-radius: 18px;
         }
         .widget.mode-compact .title-bar { padding: 6px 10px; }
         .widget.mode-compact .widget-body { padding: 10px; }
@@ -102,26 +106,117 @@
         .widget.mode-compact .preset-btn { padding: 5px 10px; font-size: 10px; }
         .widget.mode-compact .controls { gap: 6px; }
         .widget.mode-compact .control-btn { padding: 10px; font-size: 11px; }
-        .widget.mode-compact .reset-btn { flex: 0.3; padding: 10px 8px; }
+        .widget.mode-compact .reset-btn { display: none; }
         
         /* ============================================
-           MODE: LANDSCAPE - Horizontal layout
+           MODE: LANDSCAPE - Premium Glass Bar Design
            ============================================ */
         .widget.mode-landscape {
-            width: 320px;
+            width: 340px;
         }
-        .widget.mode-landscape .title-bar { padding: 5px 10px; }
+        
+        .widget.mode-landscape .title-bar { 
+            padding: 4px 8px;
+            background: transparent;
+        }
+        .widget.mode-landscape .title-text { display: none; }
         .widget.mode-landscape .widget-body {
             display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 14px;
+            flex-direction: column;
+            padding: 8px 16px 12px;
+            gap: 8px;
         }
-        .widget.mode-landscape .timer-container { margin: 0; flex-shrink: 0; }
-        .widget.mode-landscape .timer-ring { width: 60px; height: 60px; }
-        .widget.mode-landscape .timer-digits { font-size: 16px; }
-        .widget.mode-landscape .timer-status { display: none; }
-        .widget.mode-landscape .landscape-right { display: flex !important; flex-direction: column; gap: 6px; flex: 1; }
+        
+        /* Main row: Timer + Play button */
+        .widget.mode-landscape .timer-container { display: none; }
+        .widget.mode-landscape .landscape-right { 
+            display: flex !important; 
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .widget.mode-landscape .landscape-main-row {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        
+        /* Big gradient timer */
+        .widget.mode-landscape .landscape-timer {
+            display: block !important;
+            font-size: 52px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 30%, #6366f1 50%, #38bdf8 80%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            letter-spacing: -2px;
+            text-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Play button on right */
+        .widget.mode-landscape .landscape-right .controls-h { 
+            display: flex !important;
+        }
+        .widget.mode-landscape .landscape-right .ctrl-btn-h { 
+            width: 50px; 
+            height: 50px; 
+            font-size: 20px; 
+            border: none; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .widget.mode-landscape .landscape-right .ctrl-btn-h:hover {
+            transform: scale(1.05);
+        }
+        .widget.mode-landscape .landscape-right .start-h { 
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+        }
+        .widget.mode-landscape .landscape-right .pause-h { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+        }
+        .widget.mode-landscape .landscape-right .reset-h { display: none; }
+        
+        /* Presets row at bottom */
+        .widget.mode-landscape .landscape-right .presets-h { 
+            display: flex !important; 
+            justify-content: center;
+            gap: 12px;
+        }
+        .widget.mode-landscape .landscape-right .preset-btn-h { 
+            padding: 6px 16px; 
+            font-size: 14px; 
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px; 
+            color: var(--text-muted); 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .widget.mode-landscape .landscape-right .preset-btn-h:hover {
+            color: var(--text-secondary);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .widget.mode-landscape .landscape-right .preset-btn-h.active { 
+            border-color: #38bdf8;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+        }
+        
+        /* Hide everything else */
         .widget.mode-landscape .stats-row,
         .widget.mode-landscape .presets,
         .widget.mode-landscape .mode-selector,
@@ -131,20 +226,19 @@
         .widget.mode-landscape .sessions-today,
         .widget.mode-landscape .headphone-tip,
         .widget.mode-landscape .controls { display: none !important; }
-        .widget.mode-landscape .landscape-right .presets-h { display: flex !important; gap: 4px; }
-        .widget.mode-landscape .landscape-right .preset-btn-h { padding: 4px 8px; font-size: 9px; background: var(--bg-secondary); border: 1px solid transparent; border-radius: 6px; color: var(--text-secondary); cursor: pointer; }
-        .widget.mode-landscape .landscape-right .preset-btn-h.active { border-color: var(--accent-primary); color: var(--text-primary); }
-        .widget.mode-landscape .landscape-right .controls-h { display: flex !important; gap: 4px; }
-        .widget.mode-landscape .landscape-right .ctrl-btn-h { flex: 1; padding: 6px 10px; font-size: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .widget.mode-landscape .landscape-right .start-h { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
-        .widget.mode-landscape .landscape-right .pause-h { background: var(--accent-warning); color: #000; }
-        .widget.mode-landscape .landscape-right .reset-h { background: var(--bg-secondary); color: var(--text-secondary); flex: 0.4; }
+        
+        /* Hide progress bar */
+        .landscape-progress { display: none; }
+        
+        /* Hide main row wrapper in non-landscape */
+        .landscape-main-row { display: none; }
         
         /* ============================================
            MODE: FULL - Original design
            ============================================ */
         .widget.mode-full {
             width: 260px;
+            border-radius: 20px;
         }
         .widget.mode-full .landscape-right { display: none !important; }
         
@@ -166,7 +260,7 @@
         
         .title-bar-buttons {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             -webkit-app-region: no-drag;
         }
         
@@ -187,12 +281,10 @@
             background: #ff5f57;
         }
         
-        .btn-minimize {
-            background: #febc2e;
-        }
-        
+        /* Hide minimize and expand buttons */
+        .btn-minimize,
         .btn-expand {
-            background: #28c840;
+            display: none;
         }
         
         .title-text {
@@ -257,6 +349,20 @@
         .opacity-btn:hover {
             background: rgba(255,255,255,0.1);
             color: var(--text-primary);
+        }
+        
+        /* Transparency ON state (widget is semi-transparent) */
+        .opacity-btn.transparency-on {
+            background: #22d3ee;
+            border-color: #22d3ee;
+            color: #000;
+        }
+        
+        /* Transparency OFF state (widget is fully visible) */
+        .opacity-btn.transparency-off {
+            background: transparent;
+            border-color: rgba(255,255,255,0.3);
+            color: var(--text-secondary);
         }
         
         /* Widget Body */
@@ -688,17 +794,21 @@
                 </div>
             </div>
             
-            <!-- Landscape mode right panel (hidden in other modes) -->
+            <!-- Landscape mode panel (hidden in other modes) -->
+            <div class="landscape-progress" id="landscapeProgress" style="width: 100%"></div>
             <div class="landscape-right">
+                <div class="landscape-main-row">
+                    <div class="landscape-timer" id="landscapeTimer">25:00</div>
+                    <div class="controls-h">
+                        <button class="ctrl-btn-h start-h" id="startBtnH">▶</button>
+                        <button class="ctrl-btn-h pause-h hidden" id="pauseBtnH">⏸</button>
+                        <button class="ctrl-btn-h reset-h" id="resetBtnH">↺</button>
+                    </div>
+                </div>
                 <div class="presets-h">
                     <button class="preset-btn-h active" data-time="25">25m</button>
                     <button class="preset-btn-h" data-time="45">45m</button>
                     <button class="preset-btn-h" data-time="60">60m</button>
-                </div>
-                <div class="controls-h">
-                    <button class="ctrl-btn-h start-h" id="startBtnH">▶ Start</button>
-                    <button class="ctrl-btn-h pause-h hidden" id="pauseBtnH">⏸ Pause</button>
-                    <button class="ctrl-btn-h reset-h" id="resetBtnH">↺</button>
                 </div>
             </div>
             
@@ -848,10 +958,10 @@
         // Mode Sizes for window resizing
         // ============================================
         const modeSizes = {
-            mini: { width: 150, height: 155 },
-            compact: { width: 200, height: 280 },
-            landscape: { width: 340, height: 110 },
-            full: { width: 280, height: 520 }
+            mini: { width: 130, height: 130 },
+            compact: { width: 200, height: 260 },
+            landscape: { width: 360, height: 145 },
+            full: { width: 280, height: 580 }
         };
         
         // ============================================
@@ -859,6 +969,8 @@
         // ============================================
         const widget = document.getElementById('widget');
         const timerDisplay = document.getElementById('timerDisplay');
+        const landscapeTimer = document.getElementById('landscapeTimer');
+        const landscapeProgress = document.getElementById('landscapeProgress');
         const timerStatus = document.getElementById('timerStatus');
         const progressRing = document.getElementById('progressRing');
         const startBtn = document.getElementById('startBtn');
@@ -917,26 +1029,44 @@
         const opacityLevels = ['full', 'medium', 'low'];
         let opacityIndex = 0;
         
+        // Update button appearance based on transparency state
+        function updateOpacityButton() {
+            if (state.opacityLevel === 'full') {
+                opacityBtn.classList.remove('transparency-on');
+                opacityBtn.classList.add('transparency-off');
+            } else {
+                opacityBtn.classList.remove('transparency-off');
+                opacityBtn.classList.add('transparency-on');
+            }
+        }
+        
+        // Initialize button state
+        updateOpacityButton();
+        
         opacityBtn.addEventListener('click', () => {
             opacityIndex = (opacityIndex + 1) % opacityLevels.length;
             state.opacityLevel = opacityLevels[opacityIndex];
             widget.className = `widget mode-${state.widgetMode} opacity-${state.opacityLevel}`;
             if (state.isRunning) widget.classList.add('active');
             localStorage.setItem('flowstate-widget-opacity', state.opacityLevel);
+            updateOpacityButton();
         });
         
         // ============================================
-        // Window Dragging
+        // Window Dragging - From ANYWHERE on the widget
         // ============================================
-        const titleBar = document.getElementById('titleBar');
         let isDragging = false;
         let dragOffset = { x: 0, y: 0 };
         
-        titleBar.addEventListener('mousedown', (e) => {
-            if (e.target.closest('.title-bar-buttons, .mode-switcher, .opacity-btn')) return;
+        // Allow dragging from anywhere except buttons
+        document.addEventListener('mousedown', (e) => {
+            // Don't drag if clicking on buttons, inputs, or interactive elements
+            if (e.target.closest('button, input, select, .mode-switcher, .opacity-btn, .title-bar-buttons')) return;
+            
             isDragging = true;
             dragOffset.x = e.clientX;
             dragOffset.y = e.clientY;
+            document.body.style.cursor = 'grabbing';
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -950,11 +1080,12 @@
         
         document.addEventListener('mouseup', () => {
             isDragging = false;
+            document.body.style.cursor = '';
         });
         
-        // Double-click title bar to snap to corner
-        titleBar.addEventListener('dblclick', (e) => {
-            if (e.target.closest('.title-bar-buttons, .mode-switcher, .opacity-btn')) return;
+        // Double-click anywhere to snap to corner (except buttons)
+        document.addEventListener('dblclick', (e) => {
+            if (e.target.closest('button, input, select, .mode-switcher, .opacity-btn, .title-bar-buttons')) return;
             ipcRenderer.send('snap-to-corner');
         });
         
@@ -1108,7 +1239,7 @@
             pauseBtn.classList.add('hidden');
             startBtn.classList.remove('hidden');
             startBtn.innerHTML = '<span>▶</span> Resume';
-            if (pauseBtnH) { pauseBtnH.classList.add('hidden'); startBtnH.classList.remove('hidden'); startBtnH.textContent = '▶ Resume'; }
+            if (pauseBtnH) { pauseBtnH.classList.add('hidden'); startBtnH.classList.remove('hidden'); startBtnH.textContent = '▶'; }
             widget.classList.remove('active');
             timerStatus.textContent = 'Paused';
             
@@ -1179,7 +1310,19 @@
         function updateDisplay() {
             const minutes = Math.floor(state.timeRemaining / 60);
             const seconds = state.timeRemaining % 60;
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.textContent = timeStr;
+            
+            // Update landscape timer too
+            if (landscapeTimer) {
+                landscapeTimer.textContent = timeStr;
+            }
+            
+            // Update landscape progress bar
+            if (landscapeProgress) {
+                const progress = (state.timeRemaining / state.duration) * 100;
+                landscapeProgress.style.width = `${progress}%`;
+            }
             
             // Update progress ring
             const circumference = 2 * Math.PI * 60;

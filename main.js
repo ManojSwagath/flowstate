@@ -45,7 +45,7 @@ function createWidgetWindow() {
     
     widgetWindow = new BrowserWindow({
         width: 200,
-        height: 280,
+        height: 260,
         x: width - 220,
         y: 20,
         frame: false,
