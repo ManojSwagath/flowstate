@@ -28,6 +28,26 @@
 | 🔥 **Streak System** | Build daily streaks to stay consistent and motivated |
 | 🏆 **Achievements** | Unlock 12 achievements for completing focus milestones |
 | 🎯 **Daily Challenges** | New challenge every day for bonus XP |
+| 🖥️ **4 Widget Modes** | Mini, Compact, Landscape, and Full - perfect for competitive programming |
+| 🫥 **Transparency Control** | Adjustable opacity so you can see through the widget while coding |
+| 📍 **Snap to Corners** | Double-click to snap widget to screen corners |
+
+## 🎮 Widget Modes
+
+Perfect for **Codeforces**, **LeetCode**, and competitive programming:
+
+| Mode | Size | Best For |
+|------|------|----------|
+| ▪ **Mini** | 150×155px | Maximum screen space, just timer |
+| ◻ **Compact** | 200×280px | Balanced view with presets |
+| ▬ **Landscape** | 340×110px | Horizontal bar, ideal for top/bottom |
+| ▣ **Full** | 280×520px | All features visible |
+
+### Keyboard Shortcuts
+- `1` `2` `3` `4` - Switch widget modes
+- `Space` - Start/Pause timer
+- `R` - Reset timer  
+- `T` - Toggle transparency
 
 ## 📸 Screenshots
 

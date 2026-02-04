@@ -44,9 +44,9 @@ function createWidgetWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
     
     widgetWindow = new BrowserWindow({
-        width: 280,
-        height: 560,
-        x: width - 300,
+        width: 200,
+        height: 280,
+        x: width - 220,
         y: 20,
         frame: false,
         transparent: true,
@@ -70,6 +70,53 @@ function createWidgetWindow() {
         if (widgetWindow) {
             widgetWindow.setPosition(x, y);
         }
+    });
+    
+    // Handle window resize for mode switching
+    ipcMain.on('resize-widget', (event, { width, height }) => {
+        if (widgetWindow) {
+            widgetWindow.setSize(width, height);
+        }
+    });
+    
+    // Handle snap to corner (double-click title bar)
+    ipcMain.on('snap-to-corner', () => {
+        if (!widgetWindow) return;
+        
+        const display = screen.getPrimaryDisplay();
+        const workArea = display.workArea;
+        const [winWidth, winHeight] = widgetWindow.getSize();
+        const [winX, winY] = widgetWindow.getPosition();
+        
+        // Find nearest corner
+        const centerX = winX + winWidth / 2;
+        const centerY = winY + winHeight / 2;
+        const midX = workArea.x + workArea.width / 2;
+        const midY = workArea.y + workArea.height / 2;
+        
+        let newX, newY;
+        const margin = 10;
+        
+        // Determine which quadrant and snap to that corner
+        if (centerX < midX && centerY < midY) {
+            // Top-left
+            newX = workArea.x + margin;
+            newY = workArea.y + margin;
+        } else if (centerX >= midX && centerY < midY) {
+            // Top-right
+            newX = workArea.x + workArea.width - winWidth - margin;
+            newY = workArea.y + margin;
+        } else if (centerX < midX && centerY >= midY) {
+            // Bottom-left
+            newX = workArea.x + margin;
+            newY = workArea.y + workArea.height - winHeight - margin;
+        } else {
+            // Bottom-right
+            newX = workArea.x + workArea.width - winWidth - margin;
+            newY = workArea.y + workArea.height - winHeight - margin;
+        }
+        
+        widgetWindow.setPosition(Math.round(newX), Math.round(newY));
     });
     
     // Handle window minimize

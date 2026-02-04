@@ -32,43 +32,155 @@
             user-select: none;
         }
         
+        /* ============================================
+           BASE WIDGET + OPACITY CONTROL
+           ============================================ */
         .widget {
-            width: 260px;
             background: linear-gradient(135deg, #1a1a24 0%, #12121a 100%);
-            border-radius: 20px;
+            border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 
                         0 0 0 1px rgba(255, 255, 255, 0.1),
                         0 0 30px rgba(99, 102, 241, 0.2);
             overflow: hidden;
+            transition: all 0.3s ease, opacity 0.2s;
         }
+        
+        /* Opacity levels - becomes solid on hover */
+        .widget.opacity-low { opacity: 0.35; }
+        .widget.opacity-medium { opacity: 0.6; }
+        .widget.opacity-full { opacity: 1; }
+        .widget:hover { opacity: 1 !important; }
+        
+        /* ============================================
+           MODE: MINI - Ultra compact (just timer)
+           ============================================ */
+        .widget.mode-mini {
+            width: 130px;
+            border-radius: 12px;
+        }
+        .widget.mode-mini .title-bar { padding: 5px 8px; }
+        .widget.mode-mini .title-text { display: none; }
+        .widget.mode-mini .widget-body { padding: 8px; }
+        .widget.mode-mini .stats-row,
+        .widget.mode-mini .presets,
+        .widget.mode-mini .mode-selector,
+        .widget.mode-mini .ambient-section,
+        .widget.mode-mini .volume-section,
+        .widget.mode-mini .xp-section,
+        .widget.mode-mini .sessions-today,
+        .widget.mode-mini .headphone-tip,
+        .widget.mode-mini .reset-btn { display: none !important; }
+        .widget.mode-mini .timer-container { margin-bottom: 8px; }
+        .widget.mode-mini .timer-ring { width: 70px; height: 70px; }
+        .widget.mode-mini .timer-digits { font-size: 18px; }
+        .widget.mode-mini .timer-status { font-size: 8px; }
+        .widget.mode-mini .controls { gap: 4px; }
+        .widget.mode-mini .control-btn { padding: 8px 10px; font-size: 11px; gap: 3px; }
+        .widget.mode-mini .mode-switcher { gap: 2px; }
+        
+        /* ============================================
+           MODE: COMPACT - Small but usable
+           ============================================ */
+        .widget.mode-compact {
+            width: 180px;
+        }
+        .widget.mode-compact .title-bar { padding: 6px 10px; }
+        .widget.mode-compact .widget-body { padding: 10px; }
+        .widget.mode-compact .stats-row { margin-bottom: 8px; gap: 8px; }
+        .widget.mode-compact .badge { padding: 4px 8px; font-size: 10px; }
+        .widget.mode-compact .mode-selector,
+        .widget.mode-compact .ambient-section,
+        .widget.mode-compact .volume-section,
+        .widget.mode-compact .xp-section,
+        .widget.mode-compact .sessions-today,
+        .widget.mode-compact .headphone-tip { display: none !important; }
+        .widget.mode-compact .timer-container { margin-bottom: 10px; }
+        .widget.mode-compact .timer-ring { width: 90px; height: 90px; }
+        .widget.mode-compact .timer-digits { font-size: 22px; }
+        .widget.mode-compact .timer-status { font-size: 9px; }
+        .widget.mode-compact .presets { margin-bottom: 10px; gap: 4px; }
+        .widget.mode-compact .preset-btn { padding: 5px 10px; font-size: 10px; }
+        .widget.mode-compact .controls { gap: 6px; }
+        .widget.mode-compact .control-btn { padding: 10px; font-size: 11px; }
+        .widget.mode-compact .reset-btn { flex: 0.3; padding: 10px 8px; }
+        
+        /* ============================================
+           MODE: LANDSCAPE - Horizontal layout
+           ============================================ */
+        .widget.mode-landscape {
+            width: 320px;
+        }
+        .widget.mode-landscape .title-bar { padding: 5px 10px; }
+        .widget.mode-landscape .widget-body {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+        }
+        .widget.mode-landscape .timer-container { margin: 0; flex-shrink: 0; }
+        .widget.mode-landscape .timer-ring { width: 60px; height: 60px; }
+        .widget.mode-landscape .timer-digits { font-size: 16px; }
+        .widget.mode-landscape .timer-status { display: none; }
+        .widget.mode-landscape .landscape-right { display: flex !important; flex-direction: column; gap: 6px; flex: 1; }
+        .widget.mode-landscape .stats-row,
+        .widget.mode-landscape .presets,
+        .widget.mode-landscape .mode-selector,
+        .widget.mode-landscape .ambient-section,
+        .widget.mode-landscape .volume-section,
+        .widget.mode-landscape .xp-section,
+        .widget.mode-landscape .sessions-today,
+        .widget.mode-landscape .headphone-tip,
+        .widget.mode-landscape .controls { display: none !important; }
+        .widget.mode-landscape .landscape-right .presets-h { display: flex !important; gap: 4px; }
+        .widget.mode-landscape .landscape-right .preset-btn-h { padding: 4px 8px; font-size: 9px; background: var(--bg-secondary); border: 1px solid transparent; border-radius: 6px; color: var(--text-secondary); cursor: pointer; }
+        .widget.mode-landscape .landscape-right .preset-btn-h.active { border-color: var(--accent-primary); color: var(--text-primary); }
+        .widget.mode-landscape .landscape-right .controls-h { display: flex !important; gap: 4px; }
+        .widget.mode-landscape .landscape-right .ctrl-btn-h { flex: 1; padding: 6px 10px; font-size: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .widget.mode-landscape .landscape-right .start-h { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
+        .widget.mode-landscape .landscape-right .pause-h { background: var(--accent-warning); color: #000; }
+        .widget.mode-landscape .landscape-right .reset-h { background: var(--bg-secondary); color: var(--text-secondary); flex: 0.4; }
+        
+        /* ============================================
+           MODE: FULL - Original design
+           ============================================ */
+        .widget.mode-full {
+            width: 260px;
+        }
+        .widget.mode-full .landscape-right { display: none !important; }
+        
+        /* Hide landscape panel by default in all non-landscape modes */
+        .landscape-right { display: none; }
+        .widget.mode-mini .landscape-right { display: none !important; }
+        .widget.mode-compact .landscape-right { display: none !important; }
         
         /* Title Bar - Draggable */
         .title-bar {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 8px 12px;
             background: rgba(0, 0, 0, 0.3);
             cursor: move;
             -webkit-app-region: drag;
+            gap: 6px;
         }
         
         .title-bar-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             -webkit-app-region: no-drag;
         }
         
         .title-btn {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: transform 0.2s;
         }
         
         .title-btn:hover {
-            opacity: 0.8;
+            transform: scale(1.2);
         }
         
         .btn-close {
@@ -86,11 +198,65 @@
         .title-text {
             flex: 1;
             text-align: center;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--text-secondary);
             letter-spacing: 1px;
             text-transform: uppercase;
+        }
+        
+        /* Mode Switcher Buttons */
+        .mode-switcher {
+            display: flex;
+            gap: 3px;
+            -webkit-app-region: no-drag;
+        }
+        
+        .mode-btn {
+            width: 18px;
+            height: 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 9px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .mode-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+        
+        .mode-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        /* Opacity Button */
+        .opacity-btn {
+            width: 18px;
+            height: 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            color: var(--text-muted);
+            -webkit-app-region: no-drag;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .opacity-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
         }
         
         /* Widget Body */
@@ -477,15 +643,22 @@
     </style>
 </head>
 <body>
-    <div class="widget" id="widget">
+    <div class="widget mode-compact opacity-full" id="widget">
         <!-- macOS-style title bar -->
         <div class="title-bar" id="titleBar">
             <div class="title-bar-buttons">
                 <button class="title-btn btn-close" id="closeBtn" title="Quit"></button>
-                <button class="title-btn btn-minimize" id="minimizeBtn" title="Minimize"></button>
+                <button class="title-btn btn-minimize" id="minimizeBtn" title="Hide to tray"></button>
                 <button class="title-btn btn-expand" id="expandBtn" title="Open Full App"></button>
             </div>
             <span class="title-text">FlowState</span>
+            <div class="mode-switcher">
+                <button class="mode-btn" data-mode="mini" title="Mini - Just timer">▪</button>
+                <button class="mode-btn active" data-mode="compact" title="Compact">◻</button>
+                <button class="mode-btn" data-mode="landscape" title="Landscape">▬</button>
+                <button class="mode-btn" data-mode="full" title="Full">▣</button>
+            </div>
+            <button class="opacity-btn" id="opacityBtn" title="Toggle transparency">◐</button>
         </div>
         
         <div class="widget-body">
@@ -512,6 +685,20 @@
                         <div class="timer-digits" id="timerDisplay">25:00</div>
                         <div class="timer-status" id="timerStatus">Ready</div>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Landscape mode right panel (hidden in other modes) -->
+            <div class="landscape-right">
+                <div class="presets-h">
+                    <button class="preset-btn-h active" data-time="25">25m</button>
+                    <button class="preset-btn-h" data-time="45">45m</button>
+                    <button class="preset-btn-h" data-time="60">60m</button>
+                </div>
+                <div class="controls-h">
+                    <button class="ctrl-btn-h start-h" id="startBtnH">▶ Start</button>
+                    <button class="ctrl-btn-h pause-h hidden" id="pauseBtnH">⏸ Pause</button>
+                    <button class="ctrl-btn-h reset-h" id="resetBtnH">↺</button>
                 </div>
             </div>
             
@@ -624,6 +811,10 @@
             isPaused: false,
             timerInterval: null,
             
+            // Widget mode: mini, compact, landscape, full
+            widgetMode: 'compact',
+            opacityLevel: 'full', // full, medium, low
+            
             // Audio
             audioContext: null,
             leftOscillator: null,
@@ -654,6 +845,16 @@
         };
         
         // ============================================
+        // Mode Sizes for window resizing
+        // ============================================
+        const modeSizes = {
+            mini: { width: 150, height: 155 },
+            compact: { width: 200, height: 280 },
+            landscape: { width: 340, height: 110 },
+            full: { width: 280, height: 520 }
+        };
+        
+        // ============================================
         // DOM Elements
         // ============================================
         const widget = document.getElementById('widget');
@@ -663,8 +864,14 @@
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const startBtnH = document.getElementById('startBtnH');
+        const pauseBtnH = document.getElementById('pauseBtnH');
+        const resetBtnH = document.getElementById('resetBtnH');
         const presetBtns = document.querySelectorAll('.preset-btn');
+        const presetBtnsH = document.querySelectorAll('.preset-btn-h');
         const binauralMode = document.getElementById('binauralMode');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const opacityBtn = document.getElementById('opacityBtn');
         
         const levelDisplay = document.getElementById('levelDisplay');
         const streakDisplay = document.getElementById('streakDisplay');
@@ -676,6 +883,49 @@
         const minutesToday = document.getElementById('minutesToday');
         
         // ============================================
+        // Mode Switching
+        // ============================================
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                setWidgetMode(mode);
+            });
+        });
+        
+        function setWidgetMode(mode) {
+            state.widgetMode = mode;
+            
+            // Update button active states
+            modeBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Update widget classes
+            widget.className = `widget mode-${mode} opacity-${state.opacityLevel}`;
+            if (state.isRunning) widget.classList.add('active');
+            
+            // Tell main process to resize window
+            const size = modeSizes[mode];
+            ipcRenderer.send('resize-widget', size);
+            
+            // Save preference
+            localStorage.setItem('flowstate-widget-mode', mode);
+        }
+        
+        // ============================================
+        // Opacity Control
+        // ============================================
+        const opacityLevels = ['full', 'medium', 'low'];
+        let opacityIndex = 0;
+        
+        opacityBtn.addEventListener('click', () => {
+            opacityIndex = (opacityIndex + 1) % opacityLevels.length;
+            state.opacityLevel = opacityLevels[opacityIndex];
+            widget.className = `widget mode-${state.widgetMode} opacity-${state.opacityLevel}`;
+            if (state.isRunning) widget.classList.add('active');
+            localStorage.setItem('flowstate-widget-opacity', state.opacityLevel);
+        });
+        
+        // ============================================
         // Window Dragging
         // ============================================
         const titleBar = document.getElementById('titleBar');
@@ -683,7 +933,7 @@
         let dragOffset = { x: 0, y: 0 };
         
         titleBar.addEventListener('mousedown', (e) => {
-            if (e.target.classList.contains('title-btn')) return;
+            if (e.target.closest('.title-bar-buttons, .mode-switcher, .opacity-btn')) return;
             isDragging = true;
             dragOffset.x = e.clientX;
             dragOffset.y = e.clientY;
@@ -700,6 +950,12 @@
         
         document.addEventListener('mouseup', () => {
             isDragging = false;
+        });
+        
+        // Double-click title bar to snap to corner
+        titleBar.addEventListener('dblclick', (e) => {
+            if (e.target.closest('.title-bar-buttons, .mode-switcher, .opacity-btn')) return;
+            ipcRenderer.send('snap-to-corner');
         });
         
         // ============================================
@@ -724,16 +980,50 @@
         pauseBtn.addEventListener('click', pauseTimer);
         resetBtn.addEventListener('click', resetTimer);
         
-        presetBtns.forEach(btn => {
+        // Landscape mode buttons
+        if (startBtnH) startBtnH.addEventListener('click', startTimer);
+        if (pauseBtnH) pauseBtnH.addEventListener('click', pauseTimer);
+        if (resetBtnH) resetBtnH.addEventListener('click', resetTimer);
+        
+        // All preset buttons (regular + landscape)
+        const allPresetBtns = document.querySelectorAll('.preset-btn, .preset-btn-h');
+        allPresetBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                presetBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+                allPresetBtns.forEach(b => b.classList.remove('active'));
+                // Activate matching presets in both sets
+                document.querySelectorAll(`[data-time="${btn.dataset.time}"]`).forEach(b => b.classList.add('active'));
                 
                 const minutes = parseInt(btn.dataset.time);
                 state.duration = minutes * 60;
                 state.timeRemaining = state.duration;
                 updateDisplay();
             });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // 1-4 keys to switch modes
+            if (e.key === '1') setWidgetMode('mini');
+            if (e.key === '2') setWidgetMode('compact');
+            if (e.key === '3') setWidgetMode('landscape');
+            if (e.key === '4') setWidgetMode('full');
+            
+            // Space to start/pause
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault();
+                if (state.isRunning) pauseTimer();
+                else startTimer();
+            }
+            
+            // R to reset
+            if (e.key === 'r' || e.key === 'R') {
+                resetTimer();
+            }
+            
+            // T to toggle opacity
+            if (e.key === 't' || e.key === 'T') {
+                opacityBtn.click();
+            }
         });
         
         binauralMode.addEventListener('change', (e) => {
@@ -788,6 +1078,7 @@
             
             startBtn.classList.add('hidden');
             pauseBtn.classList.remove('hidden');
+            if (startBtnH) { startBtnH.classList.add('hidden'); pauseBtnH.classList.remove('hidden'); }
             widget.classList.add('active');
             timerStatus.textContent = 'Focusing...';
             
@@ -817,6 +1108,7 @@
             pauseBtn.classList.add('hidden');
             startBtn.classList.remove('hidden');
             startBtn.innerHTML = '<span>▶</span> Resume';
+            if (pauseBtnH) { pauseBtnH.classList.add('hidden'); startBtnH.classList.remove('hidden'); startBtnH.textContent = '▶ Resume'; }
             widget.classList.remove('active');
             timerStatus.textContent = 'Paused';
             
@@ -834,6 +1126,7 @@
             pauseBtn.classList.add('hidden');
             startBtn.classList.remove('hidden');
             startBtn.innerHTML = '<span>▶</span> Start';
+            if (pauseBtnH) { pauseBtnH.classList.add('hidden'); startBtnH.classList.remove('hidden'); startBtnH.textContent = '▶ Start'; }
             widget.classList.remove('active');
             timerStatus.textContent = 'Ready';
             
@@ -868,6 +1161,7 @@
             pauseBtn.classList.add('hidden');
             startBtn.classList.remove('hidden');
             startBtn.innerHTML = '<span>▶</span> Start';
+            if (pauseBtnH) { pauseBtnH.classList.add('hidden'); startBtnH.classList.remove('hidden'); startBtnH.textContent = '▶ Start'; }
             widget.classList.remove('active');
             timerStatus.textContent = '🎉 Complete!';
             
@@ -1313,6 +1607,21 @@
                     state.minutesToday = 0;
                 }
             }
+            
+            // Load mode preference
+            const savedMode = localStorage.getItem('flowstate-widget-mode');
+            if (savedMode && ['mini', 'compact', 'landscape', 'full'].includes(savedMode)) {
+                setWidgetMode(savedMode);
+            }
+            
+            // Load opacity preference
+            const savedOpacity = localStorage.getItem('flowstate-widget-opacity');
+            if (savedOpacity && opacityLevels.includes(savedOpacity)) {
+                opacityIndex = opacityLevels.indexOf(savedOpacity);
+                state.opacityLevel = savedOpacity;
+                widget.className = `widget mode-${state.widgetMode} opacity-${state.opacityLevel}`;
+            }
+            
             updateStatsDisplay();
         }
         
